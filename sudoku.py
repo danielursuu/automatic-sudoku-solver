@@ -6,6 +6,7 @@ import math
 import numpy as np
 from matplotlib import pyplot as plt
 from keras.models import load_model
+from cv2 import cv2
 
 
 def show_image(img):
@@ -54,53 +55,41 @@ def display_rects(in_img, rects, colour=255):
 # Dilate image to increase thickness of lines
 
 
-def preprocess_img(img, skip_dilate=False):
-
-    # Kernel size: +ve, odd, square
-    preprocess = cv2.GaussianBlur(img.copy(), (9, 9), 0)
+def preprocess_img(img):
+    # Gaussian blur with a kernel size (height, width)
+    blur = cv2.GaussianBlur(img.copy(), (9, 9), 0)
 
     # cv2.adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, constant(c))
     # the threshold value T(x, y) is a weighted sum (cross-correlation with a Gaussian window) of {blockSize} x {blockSize} neighborhood of (x, y) minus C
-    preprocess = cv2.adaptiveThreshold(
-        preprocess, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    thresh = cv2.adaptiveThreshold(
+        blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    # we need grid edges, hence,
-    # invert colors: gridlines will have non-zero pixels
-    preprocess = cv2.bitwise_not(preprocess, preprocess)
+    # to make gridlines have non-zero pixel values, we will invert the colors
+    bitwise = cv2.bitwise_not(thresh, thresh)
 
-    if not skip_dilate:
-        kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]])
-        preprocess = cv2.dilate(preprocess, np.uint8(kernel))
+    kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]])
+    preprocess = cv2.dilate(bitwise, np.uint8(kernel))
+
+    plot_many_images([blur, thresh, bitwise, preprocess], [
+                     "blur", "thresh", "bitwise", "dilate"], rows=2)
 
     return preprocess
 
 
-def find_external_contours(processed_image):
-
+def plot_external_contours(processed_image):
     # findContours: boundaries of shapes having same intensity
     # CHAIN_APPROX_SIMPLE - stores only minimal information of points to describe contour
     # -> RETR_EXTERNAL gives "outer" contours, so if you have (say) one contour enclosing another (like concentric circles), only the outermost is given.
-    # -> RETR_LIST gives all the contours and doesn't even bother calculating the hierarchy -- good if you only want the contours and don't care whether one is nested inside another.
-    # -> RETR_CCOMP gives contours and organises them into outer and inner contours. Every contour is either the outline of an object, or the outline of an object inside another object (i.e. hole). The hierarchy is adjusted accordingly. This can be useful if (say) you want to find all holes.
-    # -> RETR_TREE calculates the full hierarchy of the contours. So you can say that object1 is nested 4 levels deep within object2 and object3 is also nested 4 levels deep.
 
-    ext_contours, hier = cv2.findContours(
+    contours, _ = cv2.findContours(
         processed_image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contours, hier = cv2.findContours(
-        processed_image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     processed_image = cv2.cvtColor(processed_image, cv2.COLOR_GRAY2RGB)
-    # show_image(processed_image)
 
-    # Draw all contours on image in 2px red lines
-    all_contours = cv2.drawContours(
-        processed_image.copy(), contours, -1, (0, 255, 0,), 2)
-    external_contours = cv2.drawContours(
-        processed_image.copy(), ext_contours, -1, (0, 255, 0), 2)
+    contours = cv2.drawContours(
+        processed_image.copy(), contours, -1, (0, 255, 0), 2)
 
-    # Plot images
-    # plot_many_images([all_contours, external_contours],
-    #                  ['All contours', 'External Only'])
+    show_image(contours)
 
 
 def get_corners_of_largest_poly(img):
@@ -246,52 +235,53 @@ def extract_number(sudoku, loaded_model):
 # 	return n10()
 
 def pre_process_for_model(image):
-	(thresh, gray) = cv2.threshold(image, 128,
-	 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    (thresh, gray) = cv2.threshold(image, 128,
+                                   255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
-	# while np.sum(gray[0]) == 0:
-	# 	gray = gray[1:]
+    # while np.sum(gray[0]) == 0:
+    # 	gray = gray[1:]
 
-	# while np.sum(gray[:,0]) == 0:
-	# 	gray = np.delete(gray,0,1)
+    # while np.sum(gray[:,0]) == 0:
+    # 	gray = np.delete(gray,0,1)
 
-	# while np.sum(gray[-1]) == 0:
-	# 	gray = gray[:-1]
+    # while np.sum(gray[-1]) == 0:
+    # 	gray = gray[:-1]
 
-	# while np.sum(gray[:,-1]) == 0:
-	# 	gray = np.delete(gray,-1,1)
+    # while np.sum(gray[:,-1]) == 0:
+    # 	gray = np.delete(gray,-1,1)
 
-	# rows,cols = gray.shape
+    # rows,cols = gray.shape
 
-	# if rows > cols:
-	# 	factor = 20.0/rows
-	# 	rows = 20
-	# 	cols = int(round(cols*factor))
-	# 	gray = cv2.resize(gray, (cols,rows))
-	# else:
-	# 	factor = 20.0/cols
-	# 	cols = 20
-	# 	rows = int(round(rows*factor))
-	# 	gray = cv2.resize(gray, (cols, rows))
+    # if rows > cols:
+    # 	factor = 20.0/rows
+    # 	rows = 20
+    # 	cols = int(round(cols*factor))
+    # 	gray = cv2.resize(gray, (cols,rows))
+    # else:
+    # 	factor = 20.0/cols
+    # 	cols = 20
+    # 	rows = int(round(rows*factor))
+    # 	gray = cv2.resize(gray, (cols, rows))
 
-	# colsPadding = (int(math.ceil((28-cols)/2.0)),int(math.floor((28-cols)/2.0)))
-	# rowsPadding = (int(math.ceil((28-rows)/2.0)),int(math.floor((28-rows)/2.0)))
-	# gray = np.lib.pad(gray,(rowsPadding,colsPadding),'constant')
+    # colsPadding = (int(math.ceil((28-cols)/2.0)),int(math.floor((28-cols)/2.0)))
+    # rowsPadding = (int(math.ceil((28-rows)/2.0)),int(math.floor((28-rows)/2.0)))
+    # gray = np.lib.pad(gray,(rowsPadding,colsPadding),'constant')
 
-	image = cv2.resize(255-gray, (28, 28))
-	return image
+    image = cv2.resize(255-gray, (28, 28))
+    return image
+
 
 def identify_number(image, loaded_model):
-	# image=np.asarray(image)
-	
-	image_resize= pre_process_for_model(image)
-	show_image(image_resize)
-	# For input to model.predict_classes
-	image_resize_2 = image_resize.reshape((1, 28, 28, 1))
+    # image=np.asarray(image)
+
+    image_resize = pre_process_for_model(image)
+    show_image(image_resize)
+    # For input to model.predict_classes
+    image_resize_2 = image_resize.reshape((1, 28, 28, 1))
 #    cv2.imshow('number', image_test_1)
-	loaded_model_pred = loaded_model.predict_classes(image_resize_2)
-	# print('Prediction of loaded_model: {}'.format(loaded_model_pred[0]))
-	return loaded_model_pred[0]
+    loaded_model_pred = loaded_model.predict_classes(image_resize_2)
+    # print('Prediction of loaded_model: {}'.format(loaded_model_pred[0]))
+    return loaded_model_pred[0]
 
 
 def main():
@@ -301,7 +291,7 @@ def main():
 
     processed_sudoku = preprocess_img(img)
 
-    find_external_contours(processed_sudoku)
+    plot_external_contours(processed_sudoku)
     corners_of_sudoku = get_corners_of_largest_poly(processed_sudoku)
     display_points(processed_sudoku, corners_of_sudoku)
     cropped_sudoku = infer_sudoku_puzzle(img, corners_of_sudoku)
