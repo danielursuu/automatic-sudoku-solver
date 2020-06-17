@@ -10,22 +10,24 @@ from cv2 import cv2
 
 
 def show_image(img):
-    cv2.imshow('image', img)  # Display the image
-    # Wait for any key to be pressed (with the image window active)
+
+    cv2.imshow('image', img)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()  # Close all windows
+    cv2.destroyAllWindows()
 
 
 def plot_many_images(images, titles, rows=1, columns=2):
+
     for i, image in enumerate(images):
         plt.subplot(rows, columns, i+1)
         plt.imshow(image, 'gray')
         plt.title(titles[i])
         plt.xticks([]), plt.yticks([])  # Hide tick marks
+
     plt.show()
 
 
-def display_points(in_img, points, radius=5, colour=(0, 0, 255)):
+def display_points(in_img, points, radius=10, colour=(0, 255, 0)):
 
     img = in_img.copy()
     if len(colour) == 3:
@@ -36,7 +38,9 @@ def display_points(in_img, points, radius=5, colour=(0, 0, 255)):
 
     for point in points:
         img = cv2.circle(img, tuple(int(x) for x in point), radius, colour, -1)
-    # show_image(img)
+
+    show_image(img)
+
     return img
 
 
@@ -55,7 +59,7 @@ def display_rects(in_img, rects, colour=255):
 # Dilate image to increase thickness of lines
 
 
-def preprocess_img(img):
+def preprocess_img(img, skip_dilate=False):
     # Gaussian blur with a kernel size (height, width)
     blur = cv2.GaussianBlur(img.copy(), (9, 9), 0)
 
@@ -65,13 +69,14 @@ def preprocess_img(img):
         blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
     # to make gridlines have non-zero pixel values, we will invert the colors
-    bitwise = cv2.bitwise_not(thresh, thresh)
+    preprocess = cv2.bitwise_not(thresh, thresh)
 
-    kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]])
-    preprocess = cv2.dilate(bitwise, np.uint8(kernel))
+    if not skip_dilate:
+        kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]])
+        preprocess = cv2.dilate(preprocess, np.uint8(kernel))
 
-    plot_many_images([blur, thresh, bitwise, preprocess], [
-                     "blur", "thresh", "bitwise", "dilate"], rows=2)
+    # plot_many_images([blur, thresh, bitwise, preprocess], [
+    #                  "blur", "thresh", "bitwise", "dilate"], rows=2)
 
     return preprocess
 
@@ -79,7 +84,7 @@ def preprocess_img(img):
 def plot_external_contours(processed_image):
     # findContours: boundaries of shapes having same intensity
     # CHAIN_APPROX_SIMPLE - stores only minimal information of points to describe contour
-    # -> RETR_EXTERNAL gives "outer" contours, so if you have (say) one contour enclosing another (like concentric circles), only the outermost is given.
+    # RETR_EXTERNAL gives "outer" contours, so if you have (say) one contour enclosing another (like concentric circles), only the outermost is given.
 
     contours, _ = cv2.findContours(
         processed_image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -93,25 +98,15 @@ def plot_external_contours(processed_image):
 
 
 def get_corners_of_largest_poly(img):
-
     # cv2.ContourArea(): Finds area of outermost polygon(largest feature) in img.
     # Ramer Doughlas Peucker algorithm: Approximate no of sides of shape(filter rectangle objects only).
-
-    # Top Left: Smallest x and smallest y co-ordinate [minimise](x+y)
-    # Top Right: Largest x and smallest y co-ordinate [maximise](x-y)
-    # Bottom Left: Largest x and largest y co-ordinate [maximise](x+y)
-    # Bottom Right: Smallest x and largest y co-ordinate [minimise](x-y)
 
     contours, h = cv2.findContours(
         img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=cv2.contourArea,
                       reverse=True)  # Sort by area, descending
 
-    # for ele in contours:
-    #	print(ele)
-
     polygon = contours[0]  # get largest contour
-    # print(polygon)
 
     # operator.itemgetter - get index of point
     bottom_right, _ = max(enumerate([pt[0][0] + pt[0][1]
@@ -123,9 +118,6 @@ def get_corners_of_largest_poly(img):
     top_right, _ = min(enumerate([pt[0][0] - pt[0][1]
                                   for pt in polygon]), key=operator.itemgetter(1))
 
-    # print("\n"+str(bottom_right)+" "+str(bottom_left) +
-    #       " "+str(top_right)+" "+str(top_left))
-
     return [polygon[top_left][0], polygon[top_right][0], polygon[bottom_right][0], polygon[bottom_left][0]]
 
 
@@ -133,8 +125,6 @@ def infer_sudoku_puzzle(image, crop_rectangle):
     # wrapPerspective: implementation of perspective transform equation.
     # https://docs.opencv.org/3.1.0/da/d6e/tutorial_py_geometric_transformations.html
 
-    # X = (ax + by + c) / (gx + hy + 1) 	X, Y -> new coords || x,y -> old coords || a..h -> constants
-    # Y = (dx + ey + f) / (gx + hy + 1)
     # Map four coords from og img to new locations in new img
     # https://wp.optics.arizona.edu/visualopticslab/wp-content/uploads/sites/52/2016/08/Lectures6_7.pdf
 
@@ -142,12 +132,7 @@ def infer_sudoku_puzzle(image, crop_rectangle):
     crop_rect = crop_rectangle
 
     def distance_between(a, b):  # scalar distance between a and b
-        # sqrt(x^2 + y^2)      where (x -> ====) and (y -> ++++)
         return np.sqrt(((b[0] - a[0]) ** 2) + ((b[1] - a[1]) ** 2))
-        #			     ============          ++++++++++++
-        # a = p2[0] - p1[0]
-        # b = p2[1] - p1[1]
-        # return np.sqrt((a ** 2) + (b ** 2))
 
     def crop_img():  # crops rectangular portion from image and wraps it into a square of similar size
         top_left, top_right, bottom_right, bottom_left = crop_rect[
@@ -157,11 +142,6 @@ def infer_sudoku_puzzle(image, crop_rectangle):
         source_rect = np.array(
             np.array([top_left, bottom_left, bottom_right, top_right], dtype='float32'))
 
-        # get longest side in rectangle
-    # ______
-        # |      |
-        # |______|
-        #
         side = max([
             distance_between(bottom_right, top_right),
             distance_between(top_left, bottom_left),
@@ -205,6 +185,7 @@ def extract_number(sudoku, loaded_model):
         for j in range(9):
             #            image = sudoku[i*50+3:(i+1)*50-3,j*50+3:(j+1)*50-3]
             image = sudoku[i*50:(i+1)*50, j*50:(j+1)*50]
+            image=preprocess_img(image, True)
 #            filename = "images/sudoku/file_%d_%d.jpg"%(i, j)
 #            cv2.imwrite(filename, image)
             # show_image(image)
@@ -234,51 +215,12 @@ def extract_number(sudoku, loaded_model):
 # 			return roi
 # 	return n10()
 
-def pre_process_for_model(image):
-    (thresh, gray) = cv2.threshold(image, 128,
-                                   255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-
-    # while np.sum(gray[0]) == 0:
-    # 	gray = gray[1:]
-
-    # while np.sum(gray[:,0]) == 0:
-    # 	gray = np.delete(gray,0,1)
-
-    # while np.sum(gray[-1]) == 0:
-    # 	gray = gray[:-1]
-
-    # while np.sum(gray[:,-1]) == 0:
-    # 	gray = np.delete(gray,-1,1)
-
-    # rows,cols = gray.shape
-
-    # if rows > cols:
-    # 	factor = 20.0/rows
-    # 	rows = 20
-    # 	cols = int(round(cols*factor))
-    # 	gray = cv2.resize(gray, (cols,rows))
-    # else:
-    # 	factor = 20.0/cols
-    # 	cols = 20
-    # 	rows = int(round(rows*factor))
-    # 	gray = cv2.resize(gray, (cols, rows))
-
-    # colsPadding = (int(math.ceil((28-cols)/2.0)),int(math.floor((28-cols)/2.0)))
-    # rowsPadding = (int(math.ceil((28-rows)/2.0)),int(math.floor((28-rows)/2.0)))
-    # gray = np.lib.pad(gray,(rowsPadding,colsPadding),'constant')
-
-    image = cv2.resize(255-gray, (28, 28))
-    return image
-
 
 def identify_number(image, loaded_model):
-    # image=np.asarray(image)
-
-    image_resize = pre_process_for_model(image)
-    show_image(image_resize)
+    image = cv2.resize(image, (28, 28))
+    # show_image(image)
     # For input to model.predict_classes
-    image_resize_2 = image_resize.reshape((1, 28, 28, 1))
-#    cv2.imshow('number', image_test_1)
+    image_resize_2 = image.reshape((1, 28, 28, 1))
     loaded_model_pred = loaded_model.predict_classes(image_resize_2)
     # print('Prediction of loaded_model: {}'.format(loaded_model_pred[0]))
     return loaded_model_pred[0]
