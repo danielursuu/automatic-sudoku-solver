@@ -6,9 +6,9 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [MulterModule.register({
-    dest:'./uploads'
+    dest: './images'
   })],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -14,17 +14,19 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post()
+  @Post('upload')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
         destination: './images',
         filename: editFileName
       }),
-      fileFilter: imageFileFilter
+      fileFilter: imageFileFilter,
     })
   )
   async uploadImage(@UploadedFile() file) {
+    console.log("Uploaded!");
+    
     const response = {
       originalName: file.originalname,
       fileName: file.filename
