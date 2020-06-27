@@ -320,7 +320,7 @@ def get_digits(img, squares, size):
 	digits = []
 	img = preprocess_img(img.copy(), skip_dilate=True)
 	for square in squares:
-		show_image(extract_digit(img, square, size))
+		# show_image(extract_digit(img, square, size))
 		digits.append(extract_digit(img, square, size))
 	return digits
 
