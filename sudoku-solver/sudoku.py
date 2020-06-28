@@ -6,6 +6,8 @@ from matplotlib import pyplot as plt
 from keras.models import load_model
 from cv2 import cv2
 
+from solver import solve
+
 def show_image(img):
 
     cv2.imshow('image', img)
@@ -324,24 +326,28 @@ def get_digits(img, squares, size):
 		digits.append(extract_digit(img, square, size))
 	return digits
 
+
+
 def main():
-    img = cv2.imread('images/sudoku1.jpg', cv2.IMREAD_GRAYSCALE)
-    loaded_model = load_model("models/model")
-    print("Loaded saved model from disk.")
+	img = cv2.imread('images/sudoku1.jpg', cv2.IMREAD_GRAYSCALE)
+	loaded_model = load_model("models/model")
+	print("Loaded saved model from disk.")
 
-    processed_sudoku = preprocess_img(img)
+	processed_sudoku = preprocess_img(img)
 
-    plot_external_contours(processed_sudoku)
-    corners_of_sudoku = get_corners_of_largest_poly(processed_sudoku)
-    display_points(processed_sudoku, corners_of_sudoku)
-    cropped_sudoku = infer_sudoku_puzzle(img, corners_of_sudoku)
-    # show_image(cropped_sudoku)
-    squares_on_sudoku = infer_grid(cropped_sudoku)
-    display_rects(cropped_sudoku, squares_on_sudoku)
-    # loadModel()
-    digits = get_digits(cropped_sudoku, squares_on_sudoku, 28)
-    grid = extract_number(digits, loaded_model)
-    print(grid)
+	plot_external_contours(processed_sudoku)
+	corners_of_sudoku = get_corners_of_largest_poly(processed_sudoku)
+	display_points(processed_sudoku, corners_of_sudoku)
+	cropped_sudoku = infer_sudoku_puzzle(img, corners_of_sudoku)
+	# show_image(cropped_sudoku)
+	squares_on_sudoku = infer_grid(cropped_sudoku)
+	display_rects(cropped_sudoku, squares_on_sudoku)
+	digits = get_digits(cropped_sudoku, squares_on_sudoku, 28)
+	board = extract_number(digits, loaded_model)
+	print(board)
+	solved = solve(board)
+	print(solved)
+
 
 
 if __name__ == '__main__':
