@@ -1,0 +1,12 @@
+.numbers{
+    padding-top: 15px;
+}
+
+::ng-deep .ui-button{
+    margin-left: 12px !important;
+}
+
+.validate{
+    padding-top: 25px;
+    text-align: center;
+}

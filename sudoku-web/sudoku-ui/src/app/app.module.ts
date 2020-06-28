@@ -6,11 +6,15 @@ import { CardModule } from 'primeng/card';
 
 import { AppComponent } from './app.component';
 import { ImageUploaderComponent } from './image-uploader/image-uploader.component';
+import { GridComponent } from './sudoku/grid/grid.component';
+import { SudokuComponent } from './sudoku/sudoku.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ImageUploaderComponent
+    ImageUploaderComponent,
+    GridComponent,
+    SudokuComponent
   ],
   imports: [
     BrowserModule,
