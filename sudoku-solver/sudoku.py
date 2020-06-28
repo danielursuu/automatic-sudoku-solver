@@ -344,11 +344,11 @@ def main():
 	display_rects(cropped_sudoku, squares_on_sudoku)
 	digits = get_digits(cropped_sudoku, squares_on_sudoku, 28)
 	board = extract_number(digits, loaded_model)
-	print(board)
+	# print(board)
 	solved = solve(board)
-	print(solved)
+	# print(solved)
 
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

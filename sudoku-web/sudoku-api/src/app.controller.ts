@@ -1,13 +1,25 @@
-import { Controller, Get, Post, UseInterceptors, UploadedFile, Param, Res } from '@nestjs/common';
+import { Controller, Get, Post, UseInterceptors, UploadedFile, Param, Res, Logger } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
 import { AppService } from './app.service';
 import { imageFileFilter, editFileName } from './utils/image-uploading.utils';
+import { PythonService } from './shared/python.service';
+import { DataService } from './shared/data.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) { }
+
+  private readonly logger = new Logger(AppController.name, true);
+
+  constructor(
+    private readonly appService: AppService,
+    private readonly dataService: DataService
+  ) {
+    this.dataService.Output.subscribe((output => {
+      this.logger.log(output);
+    }))
+  }
 
   @Get()
   getHello(): string {
@@ -26,7 +38,7 @@ export class AppController {
   )
   async uploadImage(@UploadedFile() file) {
     console.log("Uploaded!");
-    
+
     const response = {
       originalName: file.originalname,
       fileName: file.filename
@@ -35,7 +47,7 @@ export class AppController {
   }
 
   @Get(':path')
-  getUploadedImage(@Param('path') path, @Res() res){
-    return res.sendFile(path,{root:'./images'});
+  getUploadedImage(@Param('path') path, @Res() res) {
+    return res.sendFile(path, { root: './images' });
   }
 }
