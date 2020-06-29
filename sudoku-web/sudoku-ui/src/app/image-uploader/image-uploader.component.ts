@@ -12,6 +12,8 @@ export class ImageUploaderComponent implements OnInit {
   @Output()
   uploaded = new EventEmitter<any>();
 
+  loading: boolean = false;
+
   constructor(
     private readonly imageUploadService: ImageUploadService
   ) { }
@@ -20,9 +22,11 @@ export class ImageUploaderComponent implements OnInit {
   }
 
   onUploadHandler(event, fileUpload) {
+    this.loading = true;
     this.imageUploadService.uploadImage(event.files[0]).subscribe(
       (response) => {
-        this.uploaded.emit(response);
+        this.uploaded.emit(JSON.parse(response.board));
+        this.loading = false;
       },
       (error) => console.log(error)
     );

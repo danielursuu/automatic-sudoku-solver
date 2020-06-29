@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 
 import { AppService } from './app.service';
 import { imageFileFilter, editFileName } from './utils/image-uploading.utils';
-import { DataService } from './shared/data.service';
+import { DataSolverService } from './shared/data-solver.service';
+import { DataRecognizerService } from './shared/data-recognizer.service';
 
 @Controller()
 export class AppController {
@@ -13,10 +14,9 @@ export class AppController {
 
   constructor(
     private readonly appService: AppService,
-    private readonly dataService: DataService
-  ) {
-
-  }
+    private readonly dataSolverService: DataSolverService,
+    private readonly dataRecognizerService: DataRecognizerService
+  ) { }
 
   @Get()
   getHello(): string {
@@ -35,23 +35,24 @@ export class AppController {
   async uploadImage(@UploadedFile() file, @Res() res) {
     this.logger.log("Image Uploaded!");
 
-    this.dataService.start();
-    this.dataService.Output.subscribe((output => {
+    this.dataRecognizerService.start();
+    this.dataRecognizerService.input(file.filename);
+    this.dataRecognizerService.Output.subscribe((output => {
       this.logger.log(output);
       res.send({ board: output });
-      return;
     }))
-
-    // const response = {
-    //   originalName: file.originalname,
-    //   fileName: file.filename
-    // };
-    // return response;
   }
 
   @Post('validate')
-  validateSudokuSolver(@Body() board: number[][]) {
-    this.logger.log(board);
+  validateSudokuSolver(@Body() board: number[][], @Res() res) {
+    this.logger.log("Board validated!");
+    
+    this.dataSolverService.start();
+    this.dataSolverService.input(board);
+    this.dataSolverService.Output.subscribe((output) => {
+      this.logger.log(output);
+      res.send({ board: output });
+    })
   }
 
   @Get(':path')

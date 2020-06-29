@@ -1,20 +1,21 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PythonShell } from "python-shell";
-import { config } from "./python.config";
 import { Observable, fromEvent } from "rxjs";
 
-@Injectable()
-export class PythonService {
+import { config } from "./python.config";
 
-    private readonly logger = new Logger(PythonService.name, true);
+@Injectable()
+export class SolverService {
+
+    private readonly logger = new Logger(SolverService.name, true);
     private shell: PythonShell;
 
     constructor() {
     }
-    
+
     public startup() {
         this.shell = new PythonShell('solver.py', config);
-        this.logger.log('PYTHON STARTUP');
+        this.logger.log('SOLVER STARTUP');
     }
 
     public get Response(): Observable<any> {
@@ -25,4 +26,10 @@ export class PythonService {
         this.shell.send(data);
     }
 
+    public endShell() {
+        this.shell.end((err, code, signal) => {
+            if (err) throw err;
+            this.logger.log("END SHELL")
+        });
+    }
 }

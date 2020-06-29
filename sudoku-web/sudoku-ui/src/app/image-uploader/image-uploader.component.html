@@ -1,4 +1,4 @@
-<p-card>
+<p-card *ngIf="!loading">
 	Upload an image that contains a Sudoku grid!
 	<p-footer>
 		<p-fileUpload #fileUpload mode="basic" name="file" customUpload="true"
@@ -6,3 +6,6 @@
 		</p-fileUpload>
 	</p-footer>
 </p-card>
+<div style="text-align: center;">
+	<p-progressSpinner *ngIf="loading"></p-progressSpinner>
+</div>

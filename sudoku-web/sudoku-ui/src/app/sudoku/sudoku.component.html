@@ -4,5 +4,8 @@
     <p-button *ngFor="let digit of numbers" label="{{digit}}" (click)="onClickNumber(digit)"></p-button>
 </div>
 <div class="validate">
-    <button pButton type="button" label="Validate" class="ui-button-rounded ui-button-success" (click)="onClickValidate()"></button>
+    <p-button icon="pi pi-arrow-left"  label="Upload" (click)="onUploadClick()"></p-button>
+    <button pButton type="button" label="Validate" class="ui-button-success" (click)="onClickValidate()"></button>
 </div>
+
+<p-toast></p-toast>

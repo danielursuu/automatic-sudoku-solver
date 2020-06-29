@@ -1,18 +1,5 @@
 import node
 
-board = [
-    [0, 0, 0, 6, 0, 4, 7, 0, 0],
-    [7, 0, 6, 0, 0, 0, 0, 0, 9],
-    [0, 0, 0, 0, 0, 5, 0, 8, 0],
-    [0, 7, 0, 0, 2, 0, 0, 9, 3],
-    [8, 0, 0, 0, 0, 0, 0, 0, 5],
-    [4, 3, 0, 0, 1, 0, 0, 7, 0],
-    [0, 5, 0, 2, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 2, 0, 8],
-    [0, 0, 2, 3, 0, 1, 0, 0, 0]
-]
-
-
 def solve(board):
     find = find_empty(board)
     if not find:
@@ -78,11 +65,18 @@ def find_empty(board):
 
     return None
 
+def main():
+    node.ready()
+    board = node.recive()
+    node.log(board)
+    # node.emit(board)
+    # print_board(board)
+    solve(board)
+    # print("\n___________________\n")
+    # print_board(board)
+    node.emit(board)
+    node.end()
 
-node.log('Solver Started')
-# node.emit(board)
-# print_board(board)
-# solve(board)
-# print("\n___________________\n")
-# print_board(board)
-node.emit(board)
+
+if __name__ == '__main__':
+    main()

@@ -3,8 +3,10 @@ import { MulterModule } from '@nestjs/platform-express';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PythonService } from './shared/python.service';
-import { DataService } from './shared/data.service';
+import { SolverService } from './shared/solver.service';
+import { DataSolverService } from './shared/data-solver.service';
+import { RecognizerService } from './shared/recognizer.service';
+import { DataRecognizerService } from './shared/data-recognizer.service';
 
 @Module({
   imports: [MulterModule.register({
@@ -13,8 +15,10 @@ import { DataService } from './shared/data.service';
   controllers: [AppController],
   providers: [
     AppService,
-    PythonService,
-    DataService
+    SolverService,
+    RecognizerService,
+    DataSolverService,
+    DataRecognizerService
   ],
 })
 export class AppModule { }

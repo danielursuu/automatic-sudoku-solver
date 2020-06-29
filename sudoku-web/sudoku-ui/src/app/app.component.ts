@@ -15,6 +15,11 @@ export class AppComponent {
   onUploaded(event) {
     this.uploadEnabled = false;
     this.validatorEnabled = true;
-    this.sudokuForValidation = event.board;
+    this.sudokuForValidation = event;
+  }
+
+  onBackToUpload(){
+    this.uploadEnabled = true;
+    this.validatorEnabled = false;
   }
 }

@@ -3,6 +3,10 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FileUploadModule } from 'primeng/fileupload';
 import { CardModule } from 'primeng/card';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {ToastModule} from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { ImageUploaderComponent } from './image-uploader/image-uploader.component';
@@ -18,11 +22,14 @@ import { SudokuComponent } from './sudoku/sudoku.component';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FileUploadModule,
     HttpClientModule,
-    CardModule
+    CardModule,
+    ProgressSpinnerModule,
+    ToastModule
   ],
-  providers: [],
+  providers: [MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
