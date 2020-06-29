@@ -10,8 +10,8 @@ export class PythonService {
     private shell: PythonShell;
 
     constructor() {
-        this.shell = new PythonShell('sudoku.py', config);
-        this.startup();
+        // this.shell = new PythonShell('sudoku.py', config);
+        // this.startup();
     }
 
     private startup() {

@@ -43,6 +43,11 @@ export class ApiCallerService {
     return this.http.post<any>(this.baseUrl + relativePath, body, this.getRequestOptions(null));
   }
 
+  public upload(relativePath: string, body: any): Observable<HttpResponse<any>> {
+    console.log(this.baseUrl+relativePath);
+    return this.http.post<any>(this.baseUrl + relativePath, body);
+  }
+
   public put(relativePath: string, body: any): Observable<any> {
     console.log(this.baseUrl+relativePath);
     return this.http.put(this.baseUrl + relativePath, body, this.getRequestOptions(null)).pipe(map(

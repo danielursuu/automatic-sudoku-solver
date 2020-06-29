@@ -79,10 +79,10 @@ def find_empty(board):
     return None
 
 
-node.log('Shell Started')
+node.log('Solver Started')
 node.emit(board)
-# print_board(board)
+print_board(board)
 solve(board)
-# print("\n___________________\n")
-# print_board(board)
+print("\n___________________\n")
+print_board(board)
 # node.emit(board)

@@ -11,7 +11,7 @@ export class ImageUploadService {
   constructor(private readonly apicaller: ApiCallerService) { }
 
   uploadImage(file):Observable<HttpResponse<any>> {
-    return this.apicaller.post('/upload', this.getFormData(file));
+    return this.apicaller.upload('/upload', this.getFormData(file));
   }
 
   private getFormData(file: File): FormData {

@@ -1,6 +1,7 @@
 import cv2
 import operator
 import math
+import node
 import numpy as np
 from matplotlib import pyplot as plt
 from keras.models import load_model
@@ -9,7 +10,6 @@ from cv2 import cv2
 from solver import solve
 
 def show_image(img):
-
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -175,7 +175,6 @@ def extract_number(digits, loaded_model):
 
     # split sudoku
 	k = 0
-	show_image(digits[k])
 	grid = np.zeros([9, 9])
 	for i in range(9):
 		for j in range(9):
@@ -189,7 +188,7 @@ def extract_number(digits, loaded_model):
 
 def identify_number(image, loaded_model):
     image = cv2.resize(image, (28, 28))
-    # show_image(image)
+    show_image(image)
     # For input to model.predict_classes
     image_resize_2 = image.reshape((1, 28, 28, 1))
     loaded_model_pred = loaded_model.predict_classes(image_resize_2)
@@ -329,9 +328,9 @@ def get_digits(img, squares, size):
 
 
 def main():
-	img = cv2.imread('images/sudoku1.jpg', cv2.IMREAD_GRAYSCALE)
-	loaded_model = load_model("models/model")
-	print("Loaded saved model from disk.")
+	img = cv2.imread('/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/sudoku-solver/images/sudoku10.jpg', cv2.IMREAD_GRAYSCALE)
+	loaded_model = load_model("/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/sudoku-solver/models/model")
+	node.log("Loaded saved model from disk.")
 
 	processed_sudoku = preprocess_img(img)
 
@@ -344,11 +343,13 @@ def main():
 	display_rects(cropped_sudoku, squares_on_sudoku)
 	digits = get_digits(cropped_sudoku, squares_on_sudoku, 28)
 	board = extract_number(digits, loaded_model)
-	# print(board)
-	solved = solve(board)
+	print(board)
+	# node.log("Sent board for validation")
+	# node.emit(board)
+	# solved = solve(board)
 	# print(solved)
 
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()

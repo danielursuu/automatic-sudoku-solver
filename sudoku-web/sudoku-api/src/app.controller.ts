@@ -4,7 +4,6 @@ import { diskStorage } from 'multer';
 
 import { AppService } from './app.service';
 import { imageFileFilter, editFileName } from './utils/image-uploading.utils';
-import { PythonService } from './shared/python.service';
 import { DataService } from './shared/data.service';
 
 @Controller()
@@ -16,9 +15,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly dataService: DataService
   ) {
-    this.dataService.Output.subscribe((output => {
-      this.logger.log(output);
-    }))
+    
   }
 
   @Get()
@@ -27,17 +24,20 @@ export class AppController {
   }
 
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './images',
-        filename: editFileName
-      }),
-      fileFilter: imageFileFilter,
-    })
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: '../../images',
+      filename: editFileName
+    }),
+    fileFilter: imageFileFilter,
+  })
   )
   async uploadImage(@UploadedFile() file) {
-    console.log("Uploaded!");
+    this.logger.log("Image Uploaded!");
+
+    // this.dataService.Output.subscribe((output => {
+    //   this.logger.log(output);
+    // }))
 
     const response = {
       originalName: file.originalname,
