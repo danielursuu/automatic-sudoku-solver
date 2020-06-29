@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ImageUploadService } from '../services/image-upload.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-image-uploader',
@@ -8,26 +9,23 @@ import { ImageUploadService } from '../services/image-upload.service';
 })
 export class ImageUploaderComponent implements OnInit {
 
-  uploadedFiles: any[] = [];
-
-  constructor(private readonly imageUploadService:ImageUploadService) { }
+  constructor(
+    private readonly imageUploadService: ImageUploadService,
+    private readonly router: Router
+  ) { }
 
   ngOnInit(): void {
   }
 
-  onUpload(event) {
-    for (let file of event.files) {
-      this.uploadedFiles.push(file);
-    }
-    console.log(this.uploadedFiles);
-
-  }
-
-  onUploadHandler(event){
-    console.log(event.files[0]);
-    
-    this.imageUploadService.uploadImage(event.files[0]).subscribe((response)=>console.log(response),(error)=>console.log(error));
-    
+  onUploadHandler(event, fileUpload) {
+    this.imageUploadService.uploadImage(event.files[0]).subscribe(
+      (response) => {
+        console.log(response);
+        this.router.navigate(['/validator']);
+      },
+      (error) => console.log(error)
+    );
+    fileUpload.clear();
   }
 
 }

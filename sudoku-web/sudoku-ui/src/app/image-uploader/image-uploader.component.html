@@ -1,6 +1,8 @@
 <p-card>
 	Upload an image that contains a Sudoku grid!
 	<p-footer>
-		<p-fileUpload mode="basic" name="file" customUpload="true" (uploadHandler)="onUploadHandler($event)" accept="image/*" maxFileSize="1000000" (onUpload)="onUpload($event)"></p-fileUpload>
+		<p-fileUpload #fileUpload mode="basic" name="file" customUpload="true"
+			(uploadHandler)="onUploadHandler($event,fileUpload)" accept="image/*" fileLimit="1" maxFileSize="3000000">
+		</p-fileUpload>
 	</p-footer>
 </p-card>
