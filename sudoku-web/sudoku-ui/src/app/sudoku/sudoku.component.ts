@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 import { SudokuField } from './sudoku-field';
+import { SudokuService } from '../services/sudoku.service';
 
 @Component({
   selector: 'app-sudoku',
@@ -10,14 +11,14 @@ import { SudokuField } from './sudoku-field';
 export class SudokuComponent implements OnInit {
 
   @Input()
-  sudoku: number[][]=[];
+  sudoku: number[][] = [];
 
   numbers: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   // imagePath: string;
 
   activeField: SudokuField;
 
-  constructor() { }
+  constructor(private readonly sudokuService: SudokuService) { }
 
   ngOnInit() {
   }
@@ -30,5 +31,9 @@ export class SudokuComponent implements OnInit {
     if (this.activeField) {
       this.sudoku[this.activeField.row][this.activeField.column] = digit;
     }
+  }
+
+  onClickValidate() {
+    this.sudokuService.sendValidatedSudokuBoard(this.sudoku).subscribe(response => console.log(response));
   }
 }

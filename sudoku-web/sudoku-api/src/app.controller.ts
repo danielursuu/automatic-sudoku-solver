@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseInterceptors, UploadedFile, Param, Res, Logger } from '@nestjs/common';
+import { Controller, Get, Post, UseInterceptors, UploadedFile, Param, Res, Logger, Body } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
@@ -47,6 +47,11 @@ export class AppController {
     //   fileName: file.filename
     // };
     // return response;
+  }
+
+  @Post('validate')
+  validateSudokuSolver(@Body() board: number[][]) {
+    this.logger.log(board);
   }
 
   @Get(':path')
