@@ -10,7 +10,7 @@ export class ImageUploadService {
 
   constructor(private readonly apicaller: ApiCallerService) { }
 
-  uploadImage(file):Observable<HttpResponse<any>> {
+  uploadImage(file): Observable<any> {
     return this.apicaller.upload('/upload', this.getFormData(file));
   }
 

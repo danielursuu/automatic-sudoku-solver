@@ -15,7 +15,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly dataService: DataService
   ) {
-    
+
   }
 
   @Get()
@@ -32,18 +32,21 @@ export class AppController {
     fileFilter: imageFileFilter,
   })
   )
-  async uploadImage(@UploadedFile() file) {
+  async uploadImage(@UploadedFile() file, @Res() res) {
     this.logger.log("Image Uploaded!");
 
-    // this.dataService.Output.subscribe((output => {
-    //   this.logger.log(output);
-    // }))
+    this.dataService.start();
+    this.dataService.Output.subscribe((output => {
+      this.logger.log(output);
+      res.send({ board: output });
+      return;
+    }))
 
-    const response = {
-      originalName: file.originalname,
-      fileName: file.filename
-    };
-    return response;
+    // const response = {
+    //   originalName: file.originalname,
+    //   fileName: file.filename
+    // };
+    // return response;
   }
 
   @Get(':path')

@@ -5,4 +5,16 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent { }
+export class AppComponent {
+
+  uploadEnabled: boolean = true;
+  validatorEnabled: boolean = false;
+
+  sudokuForValidation: number[][] = [];
+
+  onUploaded(event) {
+    this.uploadEnabled = false;
+    this.validatorEnabled = true;
+    this.sudokuForValidation = event.board;
+  }
+}
