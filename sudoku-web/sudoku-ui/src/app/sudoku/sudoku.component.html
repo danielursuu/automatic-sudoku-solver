@@ -1,11 +1,12 @@
-<!-- <img *ngIf="imagePath" class="images" [src]="imagePath" /> -->
 <p-card subheader="Please validate the grid! Change the incorrectly recognized digits.">
-    <grid [sudoku]="sudoku" (activeFieldChange)="onActiveFieldChange($event)"></grid>
+    <div style="text-align: center;">
+        <img *ngIf="sudoku?.fileName" class="image" src="assets/{{sudoku.fileName}}" />
+    </div>
+    <grid [sudoku]="sudoku.board" (activeFieldChange)="onActiveFieldChange($event)"></grid>
     <div class="numbers">
         <p-button *ngFor="let digit of numbers" label="{{digit}}" (click)="onClickNumber(digit)"></p-button>
     </div>
-    <br>
-    <div class="validate">
+    <br><div class="validate">
         <p-button icon="pi pi-arrow-left" label="Upload" (click)="onUploadClick()"></p-button>
         <button pButton type="button" label="Validate" class="ui-button-success" (click)="onClickValidate()"></button>
     </div>

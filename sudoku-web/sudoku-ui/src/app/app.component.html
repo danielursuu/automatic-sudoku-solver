@@ -3,8 +3,7 @@
   <div class="p-col-3">
     <h4 class="title">Automatic Sudoku Solver</h4>
     <br>
-    <br>
     <app-image-uploader *ngIf="uploadEnabled" (uploaded)="onUploaded($event)"></app-image-uploader>
-    <app-sudoku *ngIf="validatorEnabled" [sudoku]="sudokuForValidation" (backToUpload)="onBackToUpload()"></app-sudoku>
+    <app-sudoku *ngIf="validatorEnabled" [sudoku]="sudoku" (backToUpload)="onBackToUpload()"></app-sudoku>
   </div>
 </div>

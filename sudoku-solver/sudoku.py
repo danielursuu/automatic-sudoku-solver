@@ -340,7 +340,7 @@ def main():
 	node.ready()
 	image_path = node.recive()
 	node.log(image_path)
-	img = cv2.imread('/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/images/' +
+	img = cv2.imread('/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/sudoku-web/sudoku-ui/src/assets/' +
     	image_path, cv2.IMREAD_GRAYSCALE)
 	loaded_model = load_model(
     	"/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/sudoku-solver/models/model")

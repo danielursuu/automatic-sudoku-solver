@@ -12,13 +12,12 @@ import { MessageService } from 'primeng/api';
 export class SudokuComponent implements OnInit {
 
   @Input()
-  sudoku: number[][] = [];
+  sudoku: { board: number[][], fileName: string };
 
   @Output()
   backToUpload = new EventEmitter<void>();
 
   numbers: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  // imagePath: string;
 
   activeField: SudokuField;
 
@@ -36,16 +35,16 @@ export class SudokuComponent implements OnInit {
 
   onClickNumber(digit: number): void {
     if (this.activeField) {
-      this.sudoku[this.activeField.row][this.activeField.column] = digit;
+      this.sudoku.board[this.activeField.row][this.activeField.column] = digit;
     }
   }
 
   onClickValidate() {
-    this.sudokuService.sendValidatedSudokuBoard(this.sudoku).subscribe(response => {
+    this.sudokuService.sendValidatedSudokuBoard(this.sudoku.board).subscribe(response => {
       let board = response.body.board;
 
-      if (JSON.stringify(this.sudoku) !== JSON.stringify(board)) {
-        this.sudoku = board;
+      if (JSON.stringify(this.sudoku.board) !== JSON.stringify(board)) {
+        this.sudoku.board = board;
         this.messageService.add({ severity: 'success', summary: 'Sudoku Solver', detail: 'Success!' });
       } else {
         this.messageService.add({ severity: 'warn', summary: 'Sudoku Solver', detail: 'There is no solution. Please validate the grid.' });
@@ -54,7 +53,7 @@ export class SudokuComponent implements OnInit {
   }
 
   onUploadClick() {
-    this.sudoku = [];
+    this.sudoku.board = [];
     this.backToUpload.emit();
   }
 }

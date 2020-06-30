@@ -7,6 +7,12 @@
 }
 
 .validate{
-    padding-top: 25px;
+    padding-top: 10px;
     text-align: center;
+}
+
+.image{
+    max-width:50%; 
+    height:auto; 
+    margin-bottom: 10px;
 }

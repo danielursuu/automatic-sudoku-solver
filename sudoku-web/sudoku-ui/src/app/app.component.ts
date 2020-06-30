@@ -10,15 +10,15 @@ export class AppComponent {
   uploadEnabled: boolean = true;
   validatorEnabled: boolean = false;
 
-  sudokuForValidation: number[][] = [];
+  sudoku: { board: number[][], fileName: string };
 
   onUploaded(event) {
     this.uploadEnabled = false;
     this.validatorEnabled = true;
-    this.sudokuForValidation = event;
+    this.sudoku = event;
   }
 
-  onBackToUpload(){
+  onBackToUpload() {
     this.uploadEnabled = true;
     this.validatorEnabled = false;
   }

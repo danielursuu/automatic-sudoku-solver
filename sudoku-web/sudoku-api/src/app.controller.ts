@@ -26,7 +26,7 @@ export class AppController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: '../../images',
+      destination: '../sudoku-ui/src/assets/',
       filename: editFileName
     }),
     fileFilter: imageFileFilter,
@@ -39,14 +39,14 @@ export class AppController {
     this.dataRecognizerService.input(file.filename);
     this.dataRecognizerService.Output.subscribe((output => {
       this.logger.log(output);
-      res.send({ board: output });
+      res.send({ board: output, fileName: file.filename });
     }))
   }
 
   @Post('validate')
   validateSudokuSolver(@Body() board: number[][], @Res() res) {
     this.logger.log("Board validated!");
-    
+
     this.dataSolverService.start();
     this.dataSolverService.input(board);
     this.dataSolverService.Output.subscribe((output) => {

@@ -25,7 +25,7 @@ export class ImageUploaderComponent implements OnInit {
     this.loading = true;
     this.imageUploadService.uploadImage(event.files[0]).subscribe(
       (response) => {
-        this.uploaded.emit(JSON.parse(response.board));
+        this.uploaded.emit({board:JSON.parse(response.board), fileName:response.fileName});
         this.loading = false;
       },
       (error) => console.log(error)
