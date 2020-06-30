@@ -11,6 +11,14 @@ from cv2 import cv2
 from solver import solve
 
 
+def getPath():
+    return '/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/'
+
+
+def getPathForDemo(filename):
+    return getPath() + '/sudoku-solver/demo/' + filename
+
+
 def show_image(img):
     cv2.imshow('image', img)
     cv2.waitKey(0)
@@ -40,6 +48,7 @@ def display_points(in_img, points, radius=10, colour=(0, 255, 0)):
     for point in points:
         img = cv2.circle(img, tuple(int(x) for x in point), radius, colour, -1)
 
+    cv2.imwrite(getPathForDemo('points.jpg'),img)
     # show_image(img)
 
     return img
@@ -51,6 +60,7 @@ def display_rects(in_img, rects, colour=255):
     for rect in rects:
         img = cv2.rectangle(img, tuple(int(x)
                                        for x in rect[0]), tuple(int(x) for x in rect[1]), colour)
+    cv2.imwrite(getPathForDemo('squares.jpg'),img)
     # show_image(img)
 
 # Blur image to reduce noise obtained in thresholding algorithm
@@ -94,6 +104,7 @@ def plot_external_contours(processed_image):
     contours = cv2.drawContours(
         processed_image.copy(), contours, -1, (0, 255, 0), 2)
 
+    cv2.imwrite(getPathForDemo('contours.jpg'), contours)
     # show_image(contours)
 
 
@@ -337,34 +348,35 @@ def get_digits(img, squares, size):
 
 
 def main():
-	node.ready()
-	image_path = node.recive()
-	node.log(image_path)
-	img = cv2.imread('/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/sudoku-web/sudoku-ui/src/assets/' +
-    	image_path, cv2.IMREAD_GRAYSCALE)
-	loaded_model = load_model(
-    	"/home/dursu/Desktop/sudokuu/automatic-sudoku-solver/sudoku-solver/models/model")
-	node.log("Loaded saved model from disk.")
+    node.ready()
+    image_path = node.recive()
+    node.log(image_path)
+    img = cv2.imread(getPath() + '/sudoku-web/sudoku-ui/src/assets/' +
+                     image_path, cv2.IMREAD_GRAYSCALE)
 
-	processed_sudoku = preprocess_img(img)
+    # img = cv2.imread('images/sudoku1.jpg', cv2.IMREAD_GRAYSCALE)
 
-	plot_external_contours(processed_sudoku)
-	corners_of_sudoku = get_corners_of_largest_poly(processed_sudoku)
-	display_points(processed_sudoku, corners_of_sudoku)
-	cropped_sudoku = infer_sudoku_puzzle(img, corners_of_sudoku)
-	# show_image(cropped_sudoku)
-	squares_on_sudoku = infer_grid(cropped_sudoku)
-	display_rects(cropped_sudoku, squares_on_sudoku)
-	digits = get_digits(cropped_sudoku, squares_on_sudoku, 28)
-	board = extract_number(digits, loaded_model)
-	# print(board)
-	# node.log("Sent board for validation")
-	lists = board.tolist()
-	json_str = json.dumps(lists)
-	node.emit(json_str)
-	node.end()
-	# solved = solve(board)
-	# print(solved)
+    loaded_model = load_model(
+        getPath() + "/sudoku-solver/models/model")
+    node.log("Loaded saved model from disk.")
+
+    processed_sudoku = preprocess_img(img)
+
+    plot_external_contours(processed_sudoku)
+    corners_of_sudoku = get_corners_of_largest_poly(processed_sudoku)
+    display_points(processed_sudoku, corners_of_sudoku)
+    cropped_sudoku = infer_sudoku_puzzle(img, corners_of_sudoku)
+    cv2.imwrite(getPathForDemo('cropped_sudoku.jpg'),cropped_sudoku)
+    # show_image(cropped_sudoku)
+    squares_on_sudoku = infer_grid(cropped_sudoku)
+    display_rects(cropped_sudoku, squares_on_sudoku)
+    digits = get_digits(cropped_sudoku, squares_on_sudoku, 28)
+
+    board = extract_number(digits, loaded_model)
+    lists = board.tolist()
+    json_str = json.dumps(lists)
+    node.emit(json_str)
+    node.end()
 
 
 if __name__ == '__main__':
