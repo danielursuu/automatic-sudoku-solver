@@ -17,7 +17,7 @@ export class SudokuComponent implements OnInit {
   @Output()
   backToUpload = new EventEmitter<void>();
 
-  numbers: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  numbers: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   activeField: SudokuField;
 

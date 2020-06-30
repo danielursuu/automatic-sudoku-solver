@@ -3,11 +3,11 @@
 }
 
 ::ng-deep .ui-button{
-    margin-left: 10px !important;
+    margin-left: 5px !important;
 }
 
 .validate{
-    padding-top: 10px;
+    padding-top: 6px;
     text-align: center;
 }
 
