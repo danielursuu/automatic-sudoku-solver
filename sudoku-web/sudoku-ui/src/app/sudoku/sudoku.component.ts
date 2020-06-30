@@ -18,12 +18,11 @@ export class SudokuComponent implements OnInit {
   backToUpload = new EventEmitter<void>();
 
   numbers: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
   activeField: SudokuField;
 
   constructor(
     private readonly sudokuService: SudokuService,
-    private messageService: MessageService
+    private readonly messageService: MessageService
   ) { }
 
   ngOnInit() {
